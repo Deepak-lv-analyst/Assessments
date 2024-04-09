@@ -1,0 +1,43 @@
+1)select CustomerID,DataUsed from customerinteractions where Month='March' and Year=2024 and DataUsed>(select avg(DataUsed) from customerinteractions where month='March');
+
+2)select A.customerID  from
+(select customerID,CallDuration,Month from customerinteractions ) as A ,
+(select customerID,CallDuration,Month from customerinteractions)  as B
+where A.Month='March' and B.Month='February' and A.CallDuration>B.CallDuration and A.customerID=B.customerID;
+
+
+3)select A.customerID  from
+(select customerID,CallDuration,Month,MessageCount,DataUsed from customerinteractions ) as A ,
+(select customerID,CallDuration,Month,MessageCount,DataUsed from customerinteractions ) as B
+where A.Month='March' and B.Month='February' and A.MessageCount<B.MessageCount and A.DataUsed=B.DataUsed;
+
+
+4)select sum(TotalSalesAmount) as total_Sales from quarterlysales where ProductTypeID=1;
+
+5)select productTypeID from quarterlysales where Quarter='Q1' and Year=2024;
+
+6)select avg(TotalSalesAmount/UnitsSold) as avg_sales_price from quarterlysales where Quarter='Q2' and Year=2024 and productTypeID=1; 
+
+7)select region from sectorenergyconsumption where (select avg(ConsumptionKWh) from
+sectorenergyconsumption where EnergySource in ('Wind','Solar') and Year=2024)>
+(select avg(ConsumptionKWh) from sectorenergyconsumption where EnergySource in ('Wind','Solar'));
+
+8)select distinct A.sector from (select Sector,Month,ConsumptionKWh from sectorenergyconsumption) as A,
+(select Sector,Month,ConsumptionKWh from sectorenergyconsumption) as B where A.sector=B.sector and 
+A.ConsumptionKWh>B.ConsumptionKWh and A.Month='March' and B.Month='February';
+
+
+9)select (select sum(ConsumptionKWH) from sectorenergyconsumption where EnergySource='Fossil Fuels'
+and Month='February' and Year=2024) as A;
+select (select sum(ConsumptionKWH) from sectorenergyconsumption where EnergySource!='Fossil Fuels'
+and Month='February' and Year=2024) as B;
+
+
+10)select CustomerName from insuranceactivities where  Investigation='No' and FeedBackScore
+>(select avg(FeedbackScore) from insuranceactivities);
+
+
+11)
+
+
+12)
