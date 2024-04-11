@@ -1,0 +1,45 @@
+1)select machine_id from l1_maintenance_records where month(maintenance_date)=3 and year(maintenance_date)=2024
+  and cost>(select avg(cost) from l1_maintenance_records where month(maintenance_date)=3);
+
+2)select maintenance_type,count(maintenance_id) as c from l1_maintenance_records where 
+  month(maintenance_date)=3 and year(maintenance_date)=2024 group by maintenance_type order by c desc limit 1;
+
+3)select technician_name,count(maintenance_id) as c,avg(cost) as a from l1_maintenance_records  group by  
+  technician_name order by
+  c desc,a desc;
+
+4)select product_id,avg(incident_count_pre_update-incident_count_post_update) as avg_reduction_count
+  from l2_updates group by product_id;
+
+5)select update_id from l2_updates group by update_id order by user_feedback_score desc limit 1;
+
+6)select product_id from l2_updates where (incident_count_pre_update-incident_count_post_update)=
+  (select min(incident_count_pre_update-incident_count_post_update) from l2_updates);
+
+7)select l3_patients.patient_name,group_concat(l3_facilities.facility_name) as facility_names,  
+  group_concat(l3_visits.reason_for_visit) as reasons_for_visits, group_concat(l3_treatments.outcome) 
+  as treatment_outcomes from   l3_visits join l3_patients using (patient_id) join l3_facilities using(facility_id)
+  join l3_treatments using(visit_id) where month(l3_visits.visit_date)=3 and year(l3_visits.visit_date)=2024  
+  group by l3_patients.patient_id;
+
+8)select l3_facilities.facility_name ,count(l3_visits.visit_id) as c from l3_facilities join l3_visits
+  using (facility_id)  where  l3_visits.reason_for_visit ='Emergency' and month(l3_visits.visit_date) =3
+  and year(l3_visits.visit_date) =2024 group by l3_facilities.facility_name order by c desc;
+
+9)select l3_patients.insurance_provider ,count(l3_patients.patient_id) as c from l3_patients join l3_visits using (patient_id)
+  join l3_treatments using (visit_id) where month(l3_visits.visit_date)<=3 and year(l3_visits.visit_date)=2024 
+  and l3_treatments.outcome='Complicated' group by l3_patients.insurance_provider order by c desc limit 1;
+
+10)  select A.name,A.category,A.quantity from (select l4_products.product_name as name ,l4_products.category as category,sum(l4_sales.quantity) as quantity 
+   from l4_products join l4_sales
+  using(product_id) group by l4_products.category,l4_products.product_name) as A   where quantity=
+  (select max(B.quantity) from (select l4_products.product_name as name ,l4_products.category as category,sum(l4_sales.quantity) as quantity from 
+  l4_products join l4_sales
+  using(product_id) group by l4_products.category,l4_products.product_name) as B where B.category=A.category) group by A.category,A.name;
+
+11)create view view_sales2 as select  l4_stores.region, sum(l4_sales.quantity*l4_products.price) as total_sales from
+l4_products join l4_sales using(product_id) join l4_stores using (store_id)  where year(l4_sales.sale_date)=2024 and
+month(l4_sales.sale_date)<=3 group by l4_stores.region order by total_Sales desc;
+select * from view_sales2;
+
+12)select l4_products.product_name from l4_products left join l4_sales using(product_id) ;
