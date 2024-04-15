@@ -1,0 +1,74 @@
+1)select products.product_category,avg(sales_records.sales_amount) from products join sales_records using(product_id)
+where sales_date between date_sub((select max(sales_date) from sales_records),interval 1 month) and (select max(sales_date) from sales_records) 
+group by products.product_category;
+
+2)select  dense_rank () over (order by sum(sales_amount) desc) as ranks ,products.product_name,sum(sales_amount ) as sum_of_sales from products join sales_records using(product_id) 
+group by products.product_name order by sum(sales_amount) desc limit 3 ;
+
+3)select customer_id,customer_name,dense_rank() over(order by sum(sales_amount) desc) as ranked ,sum(sales_amount),
+round(percent_rank() over (order by sum(sales_amount) )*100,2) as percent_rank_c from customers join sales_records using(customer_id)
+group by customer_id order by ranked;
+
+4)with t as (
+select sales_date,customers.customer_id as customer_id ,count(customer_id) as c from customers join sales_records
+using(customer_id) group by sales_Records.sales_Date,customers.customer_id)
+select t.customer_id,month(t.sales_date),t.c,(case when 
+t.sales_date between date_sub((select max(sales_records.sales_date) from sales_records),interval 6 month) and
+(select max(sales_records.sales_date) from sales_records) then 'Consistent buyer'
+else 'Occasional Buyer'
+end) as info from t,sales_records where sales_records.sales_date between date_sub((select max(sales_records.sales_date) from sales_records),interval 6 month) and
+(select max(sales_records.sales_date) from sales_records) and t.c>=4 and t.customer_id=sales_records.customer_id;
+
+
+5)select departure_airport,arrival_airport ,avg(ticket_price) as average_ticket_price from flights join
+tickets using(flight_id) group by departure_airport,arrival_airport ;
+
+6)select flight_number,count(ticket_id) as ticket_sales from flights join tickets using (flight_id)
+where month(ticket_date)<=(select max(month(ticket_date))-1 from tickets)
+group by flight_id order by ticket_sales desc;
+
+7)select passengers.passenger_name ,sum(ticket_price) as total_amount_spent,frequent_flyer_status from passengers join tickets using(passenger_id)group by
+passengers.passenger_name,frequent_flyer_status order by sum(ticket_price) desc limit 5 ;
+
+8)select month(ticket_date) as month_tickets_sold ,count(ticket_id) as total_tickets_sold from tickets 
+group by month(ticket_date) order by total_tickets_sold desc limit 1;
+
+
+9)select player_name, avg(minute(playerscores.play_date-players.registration_date)) as avg_play_time from players join
+playerscores using(player_id) group by player_name;
+
+10)select game_id,game_name ,count(distinct player_id) as number_of_players from  games join
+playerscores using(game_id) group by game_id,game_name order by number_of_players desc limit 3; 
+
+
+11)select game_id,game_name , avg(score) as avg_score,max(score) as max_score,count(distinct player_id) as number_of_players from  games join
+playerscores using(game_id) group by game_id,game_name order by number_of_players desc ; 
+
+
+12)select distinct player_name,registration_date,max(play_date) as recent_play_Date from players join playerscores using(player_id)
+where month(play_date)<(select max(month(play_date))-1 from playerscores) group by player_name,registration_Date;
+
+13)select doctors.doctor_name,doctors.doctor_id ,sum(cost) as total_cost from doctors join treatments using(doctor_id)
+group by doctors.doctor_name,doctors.doctor_id order by total_cost desc;
+
+14)select treatment_name,sum(cost) as total_revenue,round(percent_rank() over (order by sum(cost)  )*100,2) as contribution_percentage from treatments 
+group by treatment_name order by total_revenue desc;
+
+15)select patient_id,patient_name,admission_date,discharge_date from patients where patient_id in
+(select  patient_id from treatments group by patient_id having count(treatment_id) >1) order by admission_Date;
+
+16)select patients.gender,patients.diagnosis ,round(avg(discharge_date-admission_date)) as los from patients 
+group by patients.gender,patients.diagnosis;
+
+17)select department,semester,avg(grade) as avg_grade from courses join enrollments using(course_id) group by
+department,semester order by department,semester;
+
+18)select major,count(student_id) as no_of_students,enrollment_year from students join enrollments using(student_id) group by
+major,enrollment_year order by no_of_students desc;
+
+19)select student_id,student_name,semester,sum(credits) as total_credits from students join enrollments using(student_id) join
+courses using(course_id)  group by student_id,student_name,semester having sum(credits)>=50 ;
+
+20)select course_name,enrollment_year,count(student_id)as total_students_enrolled from students join enrollments using(student_id) join
+courses using(course_id) group by  course_name,enrollment_year order by total_students_enrolled desc limit 3;
+
